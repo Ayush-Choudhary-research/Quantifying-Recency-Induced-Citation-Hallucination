@@ -1,0 +1,51 @@
+Time_Period,Topic,Generated_Title,Generated_Author,Generated_Year,Verification_Status
+pre_2022,Long Short-Term Memory (LSTM) networks for machine translation,Long Short-Term Memory,Hochreiter,1997,VERIFIED
+pre_2022,Long Short-Term Memory (LSTM) networks for machine translation,Sequence to Sequence Learning with Neural Networks,Sutskever,2014,VERIFIED
+pre_2022,Long Short-Term Memory (LSTM) networks for machine translation,Neural Machine Translation by Jointly Learning to Align and Translate,Bahdanau,2015,VERIFIED
+pre_2022,Long Short-Term Memory (LSTM) networks for machine translation,Effective Approaches to Attention-based Neural Machine Translation,Luong,2015,VERIFIED
+pre_2022,Long Short-Term Memory (LSTM) networks for machine translation,Google's Neural Machine Translation System: Bridging the Gap between Human and Machine Translation,Wu,2016,VERIFIED
+pre_2022,Convolutional Neural Networks (CNNs) for facial recognition,DeepFace: Closing the Gap to Human-Level Performance in Face Verification,Taigman,2014,VERIFIED
+pre_2022,Convolutional Neural Networks (CNNs) for facial recognition,FaceNet: A Unified Embedding for Face Recognition and Clustering,Schroff,2015,VERIFIED
+pre_2022,Convolutional Neural Networks (CNNs) for facial recognition,ArcFace: Additive Angular Margin Loss for Deep Face Recognition,Deng,2019,VERIFIED
+pre_2022,Convolutional Neural Networks (CNNs) for facial recognition,CosFace: Large Margin Cosine Loss for Deep Face Recognition,Wang,2018,API_ERROR
+pre_2022,Convolutional Neural Networks (CNNs) for facial recognition,Deep Learning for Face Recognition: A Survey,Wang,2022,HALLUCINATED_AUTHOR
+pre_2022,Word2Vec and GloVe word embeddings,Efficient Estimation of Word Representations in Vector Space,Mikolov,2013,VERIFIED
+pre_2022,Word2Vec and GloVe word embeddings,Distributed Representations of Words and Phrases and their Compositionality,Mikolov,2013,VERIFIED
+pre_2022,Word2Vec and GloVe word embeddings,GloVe: Global Vectors for Word Representation,Pennington,2014,API_ERROR
+pre_2022,Word2Vec and GloVe word embeddings,"Don't count, predict! A systematic comparison of context-counting vs. context-predicting semantic vectors",Baroni,2014,VERIFIED
+pre_2022,Word2Vec and GloVe word embeddings,Improving Word Representations via Global Context and Multiple Word Prototypes,Huang,2012,API_ERROR
+pre_2022,Generative Adversarial Networks (GANs) for image synthesis,Generative Adversarial Nets,Goodfellow,2014,HALLUCINATED_AUTHOR
+pre_2022,Generative Adversarial Networks (GANs) for image synthesis,"Progressive Growing of GANs for Improved Quality, Stability, and Variation",Karras,2018,VERIFIED
+pre_2022,Generative Adversarial Networks (GANs) for image synthesis,A Style-Based Generator Architecture for Generative Adversarial Networks,Karras,2019,VERIFIED
+pre_2022,Generative Adversarial Networks (GANs) for image synthesis,Analyzing and Improving the Image Quality of StyleGAN,Karras,2020,VERIFIED
+pre_2022,Generative Adversarial Networks (GANs) for image synthesis,Alias-Free Generative Adversarial Networks,Karras,2021,VERIFIED
+pre_2022,The original Transformer architecture and multi-head attention,Attention Is All You Need,Vaswani,2017,VERIFIED
+pre_2022,The original Transformer architecture and multi-head attention,Deep Residual Learning for Image Recognition,He,2016,API_ERROR
+pre_2022,The original Transformer architecture and multi-head attention,BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding,Devlin,2018,VERIFIED
+pre_2022,The original Transformer architecture and multi-head attention,Language Models are Few-Shot Learners,Brown,2020,VERIFIED
+pre_2022,The original Transformer architecture and multi-head attention,On the Relationship between Self-Attention and Convolutional Layers,Cordonnier,2020,API_ERROR
+post_2025,Locate-then-edit methods for LLM temporal knowledge editing,Locating and Editing Factual Associations in GPT,Meng,2022,VERIFIED
+post_2025,Locate-then-edit methods for LLM temporal knowledge editing,Mass-Editing Memory in a Transformer,Meng,2023,VERIFIED
+post_2025,Locate-then-edit methods for LLM temporal knowledge editing,Transformer Feed-Forward Layers Are Key-Value Memories,Geva,2021,VERIFIED
+post_2025,Locate-then-edit methods for LLM temporal knowledge editing,Fast Model Editing at Scale,Mitchell,2022,VERIFIED
+post_2025,Locate-then-edit methods for LLM temporal knowledge editing,Can We Edit Factual Knowledge by Manipulating Model Weights?,De Cao,2021,VERIFIED
+post_2025,Agentic workflow optimization and multi-agent frameworks,Chain-of-Thought Prompting Elicits Reasoning in Large Language Models,Wei,2022,VERIFIED
+post_2025,Agentic workflow optimization and multi-agent frameworks,AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation,Wu,2023,VERIFIED
+post_2025,Agentic workflow optimization and multi-agent frameworks,Tree of Thoughts: Deliberate Problem Solving with Large Language Models,Yao,2023,VERIFIED
+post_2025,Agentic workflow optimization and multi-agent frameworks,MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework,Hong,2023,VERIFIED
+post_2025,Agentic workflow optimization and multi-agent frameworks,Reflexion: Language Agents with Verbal Reinforcement Learning,Shinn,2023,VERIFIED
+post_2025,Test-time compute scaling using reasoning tokens,Scaling Laws for Inference-Time Compute,Kaplan,2024,HALLUCINATED_AUTHOR
+post_2025,Test-time compute scaling using reasoning tokens,Quiet-STaR: Language Models Can Teach Themselves to Think Before Speaking,Zelikman,2024,VERIFIED
+post_2025,Test-time compute scaling using reasoning tokens,Large Language Monkeys: Scaling Inference Compute with Repeated Sampling,Snell,2024,HALLUCINATED_AUTHOR
+post_2025,Test-time compute scaling using reasoning tokens,Training Language Models to Self-Correct via Reinforcement Learning,Huang,2024,VERIFIED
+post_2025,Test-time compute scaling using reasoning tokens,Search-in-the-Chain: Towards Efficient and Robust Reasoning in LLMs,Wang,2024,HALLUCINATED_TITLE
+post_2025,Multimodal Retrieval-Augmented Generation pipelines,Retrieval-Augmented Multimodal Language Modeling,Sun,2023,VERIFIED
+post_2025,Multimodal Retrieval-Augmented Generation pipelines,Flamingo: a Visual Language Model for Few-Shot Learning,Alayrac,2022,VERIFIED
+post_2025,Multimodal Retrieval-Augmented Generation pipelines,Multimodal Retrieval-Augmented Generation for Visual Question Answering,Chen,2024,VERIFIED
+post_2025,Multimodal Retrieval-Augmented Generation pipelines,CLIP: Connecting Text and Images,Radford,2021,HALLUCINATED_AUTHOR
+post_2025,Multimodal Retrieval-Augmented Generation pipelines,A Survey on Retrieval-Augmented Generation for Large Language Models,Gao,2023,VERIFIED
+post_2025,Direct Preference Optimization (DPO) for model alignment,Direct Preference Optimization: Your Language Model is Secretly a Reward Model,Rafailov,2023,VERIFIED
+post_2025,Direct Preference Optimization (DPO) for model alignment,Statistical Rejection Sampling Improves Preference Optimization,Ethayarajh,2024,HALLUCINATED_AUTHOR
+post_2025,Direct Preference Optimization (DPO) for model alignment,IPO: Iterative Preference Optimization,Azar,2024,HALLUCINATED_AUTHOR
+post_2025,Direct Preference Optimization (DPO) for model alignment,SimPO: Simple Preference Optimization with a Reference-Free Reward,Meng,2024,VERIFIED
+post_2025,Direct Preference Optimization (DPO) for model alignment,Is DPO Superior to PPO for LLM Alignment? A Comprehensive Study,Liu,2024,VERIFIED
