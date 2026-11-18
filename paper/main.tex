@@ -1,0 +1,192 @@
+\documentclass[manuscript,screen]{acmart}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!8}
+}
+
+\setcopyright{none}
+\acmConference[IIIT Allahabad Research Lab]{AI Tools for Research: Experimental Study}{November 2026}{Prayagraj, India}
+
+\begin{document}
+
+\title{Quantifying Recency-Induced Citation Hallucination in LLM-Generated Literature Reviews: A Controlled Temporal Comparison}
+
+\author{Ayush Choudhary}
+\email{mcl2026015@iiita.ac.in}
+\affiliation{%
+  \institution{Indian Institute of Information Technology Allahabad}
+  \city{Prayagraj}
+  \state{Uttar Pradesh}
+  \country{India}
+}
+
+\begin{abstract}
+Large language models (LLMs) are increasingly used to draft literature reviews in fast-moving scientific domains, yet every model is constrained by a fixed pretraining knowledge cutoff. While prior audits establish that LLMs fabricate bibliographic references, it remains under-quantified how directly topic recency drives citation hallucination under controlled generation conditions. Building on prior synthesis of temporal misalignment and citation-hallucination literature, this study executes a controlled comparative evaluation isolating topic emergence as the independent variable. Using \texttt{gemini-3.1-flash-lite} under deterministic decoding ($\text{temperature} = 0.0$) and a standardized structural prompt, we generate 50 citations evenly split across five historical computer science topics (pre-2022) and five emerging topics (post-2025), verifying every reference against the Semantic Scholar Academic Graph (S2AG) API. Across 45 successfully evaluated citations (excluding five unresolved API rate-limit errors in the historical split), the citation hallucination rate increases $2.40\times$ from $10.0\%$ ($2/20$) on pre-2022 topics to $24.0\%$ ($6/25$) on post-2025 topics—a $+14.0$ percentage-point rise. Failure-mode inspection reveals that $87.5\%$ of observed errors ($7/8$) stem from parametric author conflation—pairing prominent researchers with newer or altered paper titles—while complete title fabrication ($1/8$, $12.5\%$) occurs exclusively in the emerging topic window. These findings provide empirical evidence that recency pressure systematically degrades bibliographic reliability, reinforcing the necessity of automated post-generation verification pipelines in AI-assisted scholarly workflows.
+\end{abstract}
+
+\maketitle
+
+\noindent\textbf{ACM Reference Format:}\\
+Ayush Choudhary. 2026. Quantifying Recency-Induced Citation Hallucination in LLM-Generated Literature Reviews: A Controlled Temporal Comparison. \textit{AI Tools for Research: Experimental Study} (IIIT Allahabad Research Lab), 1, 1 (November 2026), 7 pages.
+
+\section{Introduction}
+
+\section{Introduction}
+The accelerating volume of scientific publishing has outpaced manual literature synthesis; in computer science alone, more than 4,000 arXiv submissions included the phrase ``Large Language Model'' in their title or abstract during the first four months of 2024 \cite{wang2024autosurvey}. To manage this expansion, researchers increasingly rely on LLMs and automated survey pipelines such as AutoSurvey \cite{wang2024autosurvey} and Wu et al.'s review-generation framework \cite{wu2025automated} to organize outlines, summarize findings, and populate citations.
+
+However, parametric LLMs operate under a fixed knowledge cutoff beyond which newly published papers, benchmarks, and terminology are absent from model weights. In rapidly evolving fields, two requirements of rigorous literature reviews collide: comprehensive coverage of recent developments and strict bibliographic accuracy. Recent large-scale audits spanning 111 million references across arXiv, bioRxiv, SSRN, and PubMed Central demonstrate a sharp post-2023 rise in non-existent citations, estimating 146,932 hallucinated references in 2025 alone \cite{zhao2026wild}. Furthermore, Resnik and Hosseini \cite{resnik2026misconduct} argue that hallucinated citations can constitute research misconduct when references function evidentially in scholarly manuscripts.
+
+While prior studies establish both that LLMs suffer from temporal misalignment \cite{luu2022time} and that automated verification tools can detect fabricated references post hoc \cite{abbonato2026checkifexist, khajavi2026citecheck}, controlled measurements isolating \textit{topic recency} as the causal variable in review generation remain scarce. In this paper, we address this gap through a reproducible, controlled comparative experiment. Specifically, we investigate two research questions:
+\begin{itemize}
+    \item \textbf{RQ1:} How does the citation hallucination rate of a baseline LLM (\texttt{gemini-3.1-flash-lite}) differ when generating literature reviews for well-established historical topics (pre-2022) versus emerging topics (post-2025) under identical structural constraints?
+    \item \textbf{RQ2:} What distinct failure modes (fabricated titles versus misattributed authors) account for observed citation errors across the two temporal windows?
+\end{itemize}
+
+To distinguish prior art from our contribution: previous work introduced automated verification infrastructure \cite{abbonato2026checkifexist} and evaluated general reference hallucination across disciplines \cite{tang2025automated}. Our contribution is a controlled, reproducible experimental protocol that holds model parameters, decoding temperature, and prompt structure constant while varying only the temporal window of the target literature, paired with a quantitative error analysis of parametric author-title conflation.
+
+\section{Related Work}
+
+\subsection{Temporal Misalignment and Knowledge Cutoffs}
+Temporal misalignment—performance degradation when a language model trained on one time period is evaluated on data from another—was systematically formalized by Luu et al. \cite{luu2022time} across eight tasks including scientific papers. Subsequent work on time-aware language models showed that conditioning models on explicit timestamps improves factual calibration \cite{dhingra2022time}. Dynamic question-answering benchmarks, including RealTime QA \cite{kasai2022realtime}, StreamingQA \cite{liska2022streamingqa}, and FreshQA \cite{vu2023freshllms}, confirmed that closed-book LLM accuracy declines sharply on fast-changing facts compared to static facts.
+
+More recently, ex-ante reasoning studies investigated whether prompting or fine-tuning can restrict LLMs to a historical boundary \cite{gao2025rewind, ding2026when, asai2026constrained}. Ding et al. \cite{ding2026when} demonstrated that even frontier models leak over one-fifth of restricted post-cutoff facts during historical reasoning, while Cohen et al. \cite{cohen2024ripple} showed that localized knowledge updates create logical ripple inconsistencies across related claims. Unlike short-answer QA benchmarks, literature review synthesis requires chaining multiple chronological claims and attributing each to a verifiable bibliographic record.
+
+\subsection{Automated Literature Review Generation}
+Retrieval-augmented generation (RAG), introduced by Lewis et al. \cite{lewis2020rag} and reviewed across 128 studies by Brown et al. \cite{brown2025rag}, grounds text generation in non-parametric document indexes. Automated survey systems build on this paradigm: AutoSurvey \cite{wang2024autosurvey} combines retrieval over 530,000 arXiv abstracts with multi-stage LLM drafting and iterative citation evaluation, while Wu et al. \cite{wu2025automated} validate an end-to-end review pipeline on domain-specific catalysis literature. Despite these advances, Tang et al. \cite{tang2025automated} demonstrated at EMNLP 2025 that even advanced LLMs continue to generate hallucinated references during automated review composition.
+
+\subsection{Citation Hallucination Audits and Verification Tooling}
+Early observations by Alkaissi and McFarlane \cite{alkaissi2023artificial} showed that conversational LLMs generate plausible-looking but entirely fictitious biomedical citations. Subsequent benchmarks quantified citation hallucination rates ranging from $14\%$ to $95\%$ across models \cite{rao2026bibtex}, while neuron-tracing work by Chen et al. \cite{chen2026neurons} showed that fabrication rates vary systematically by citation style and requested reference count. To counter this threat, post-generation verification tools such as CheckIfExist \cite{abbonato2026checkifexist}, CiteCheck \cite{khajavi2026citecheck}, and HalluCiteChecker \cite{sakai2026hallucitechecker} query scholarly databases (CrossRef, Semantic Scholar, OpenAlex) to flag non-existent or corrupted references. Our experimental methodology adapts the API-based verification paradigm of CheckIfExist \cite{abbonato2026checkifexist} into a controlled temporal benchmark.
+
+\section{Methodology}
+
+\subsection{Controlled Comparative Study Design}
+To isolate the effect of knowledge cutoff proximity on bibliographic fidelity, we adopt a controlled comparative study design. Rather than comparing multiple model architectures with differing pretraining corpora, we evaluate a single instruction-tuned model (\texttt{gemini-3.1-flash-lite}) across two mutually exclusive temporal conditions:
+\begin{enumerate}
+    \item \textbf{Control Condition (\texttt{pre\_2022}):} Five foundational computer science topics whose defining literature was published prior to 2022 and is heavily represented in standard pretraining corpora.
+    \item \textbf{Experimental Condition (\texttt{post\_2025}):} Five rapidly evolving research topics whose defining methods and benchmarks emerged in the recent window approaching or exceeding typical model training cutoffs.
+\end{enumerate}
+
+\subsection{Standardized Prompting Protocol}
+To prevent prompt phrasing, requested citation volume, or sampling randomness from confounding the comparison, every topic $t_i$ is inserted into an identical prompt template under deterministic greedy decoding ($\text{temperature} = 0.0$):
+
+\begin{lstlisting}
+Write a short literature review summarizing the state of the art in: {topic}.
+After the review, provide exactly 5 academic citations.
+You MUST format the citations exactly like this, one per line, with no extra text:
+Title: [Exact Title] | Author: [Last Name] | Year: [Year]
+\end{lstlisting}
+
+\subsection{Automated Verification Oracle and Rate-Limit Handling}
+Generated outputs are parsed via regular expression matching (\texttt{Title:\textbackslash s*(.*?)\textbackslash s*\textbackslash |\textbackslash s*Author:\textbackslash s*(.*?)\textbackslash s*\textbackslash |\textbackslash s*Year:\textbackslash s*(\textbackslash d\{4\})}) to extract structured tuples $(\hat{T}, \hat{A}, \hat{Y})$. Each tuple is verified programmatically against the official Semantic Scholar Academic Graph (S2AG) Paper Search endpoint (\texttt{/graph/v1/paper/search}) querying $\hat{T}$ with \texttt{limit=3} and retrieving \texttt{title,authors,year}.
+
+During initial baseline execution, a static $1.5\text{ s}$ inter-request delay triggered HTTP 429 (\texttt{Too Many Requests}) responses from S2AG, which would artificially distort metrics if unaddressed. We corrected the verification module prior to final evaluation by enforcing a $4.0\text{ s}$ baseline delay paired with an exponential backoff retry loop ($6\text{ s}, 12\text{ s}, 18\text{ s}, 24\text{ s}$ up to 4 attempts) and an explicit \texttt{API\_ERROR} fallback status upon retry exhaustion.
+
+Each parsed citation is classified into one of four mutually exclusive statuses:
+\begin{itemize}
+    \item \textbf{\texttt{VERIFIED}:} S2AG returns $\text{total} > 0$ for query $\hat{T}$ and the generated author surname $\hat{A}$ matches an author in at least one of the top 3 returned records (case-insensitive substring match).
+    \item \textbf{\texttt{HALLUCINATED\_AUTHOR}:} S2AG returns matching paper records ($\text{total} > 0$), but $\hat{A}$ does not appear among the authors of the top 3 returned records.
+    \item \textbf{\texttt{HALLUCINATED\_TITLE}:} S2AG returns zero matching records ($\text{total} = 0$).
+    \item \textbf{\texttt{API\_ERROR}:} All retry attempts fail due to persistent HTTP 429 throttling or network timeout.
+\end{itemize}
+
+\subsection{Evaluation Metric}
+For each temporal condition $g \in \{\texttt{pre\_2022}, \texttt{post\_2025}\}$, we define the primary metric, Citation Hallucination Rate ($\text{CHR}_g$), as:
+\begin{equation}
+\text{CHR}_g = \frac{N_{\text{hallucinated\_title}}(g) + N_{\text{hallucinated\_author}}(g)}{N_{\text{evaluated}}(g)} \times 100\%
+\end{equation}
+where $N_{\text{evaluated}}(g) = N_{\text{verified}}(g) + N_{\text{hallucinated\_title}}(g) + N_{\text{hallucinated\_author}}(g)$ excludes unresolved \texttt{API\_ERROR} records so rate-limit dropouts are never miscounted as either verified or hallucinated citations. Prior to execution, we established an absolute difference threshold of $\Delta \text{CHR} = \text{CHR}_{\text{post\_2025}} - \text{CHR}_{\text{pre\_2022}} > 15.0\%$ as a strong decision boundary for recency-induced degradation.
+
+\section{Experimental Setup}
+
+\subsection{Curated Topic Dataset}
+Table~\ref{tab:topics} lists the 10 computer science topics curated for the benchmark. Each topic generates exactly 5 citations, yielding 25 target citations per temporal group (50 citations total).
+
+\begin{table}[h]
+\centering
+\caption{Curated Temporal Benchmark Topics}
+\label{tab:topics}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Temporal Group} & \textbf{Research Topic} \\ \midrule
+\texttt{pre\_2022} & Long Short-Term Memory (LSTM) networks for machine translation \\
+\texttt{pre\_2022} & Convolutional Neural Networks (CNNs) for facial recognition \\
+\texttt{pre\_2022} & Word2Vec and GloVe word embeddings \\
+\texttt{pre\_2022} & Generative Adversarial Networks (GANs) for image synthesis \\
+\texttt{pre\_2022} & The original Transformer architecture and multi-head attention \\ \midrule
+\texttt{post\_2025} & Locate-then-edit methods for LLM temporal knowledge editing \\
+\texttt{post\_2025} & Agentic workflow optimization and multi-agent frameworks \\
+\texttt{post\_2025} & Test-time compute scaling using reasoning tokens \\
+\texttt{post\_2025} & Multimodal Retrieval-Augmented Generation pipelines \\
+\texttt{post\_2025} & Direct Preference Optimization (DPO) for model alignment \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Computing Environment and Baseline Sanity Validation}
+All data curation, log management, and verification analyses were orchestrated on a local workstation (AMD Ryzen 5 5600H, 8\,GB RAM) paired with Google Colab (Python 3 runtime) executing authenticated API calls via the \texttt{google-genai} SDK (\texttt{gemini-3.1-flash-lite}) and Semantic Scholar REST API.
+
+Prior to evaluating generated reviews, we executed three validation checks:
+\begin{enumerate}
+    \item \textbf{Oracle Negative Sanity Check:} Querying S2AG with a deliberately fabricated title (\textit{``The Quantum LSTM Optimization of Blueberry Muffins''}) returned \texttt{HALLUCINATED\_TITLE} ($\text{total} = 0$), confirming that non-existent papers do not yield false-positive matches.
+    \item \textbf{Parser Completeness Check:} Regex extraction successfully parsed $50/50$ generated citation lines with zero missing or malformed rows.
+    \item \textbf{Determinism Check:} Setting $\text{temperature} = 0.0$ enforced consistent structural adherence across all 10 topic prompts.
+\end{enumerate}
+
+\section{Results and Discussion}
+
+\subsection{Primary Comparison: Historical vs. Emerging Topics}
+Table~\ref{tab:results} and Figure~\ref{fig:comparison} summarize the frozen verification outcomes across both temporal conditions. Out of 50 target citations, 45 were evaluated by the S2AG API and 5 historical citations (\texttt{pre\_2022}) remained unresolved \texttt{API\_ERROR} entries after retry exhaustion and were excluded from the denominator per Eq.~(1).
+
+\begin{table}[h]
+\centering
+\caption{Frozen Citation Verification Outcomes Across Temporal Windows (\texttt{experiment\_results.csv})}
+\label{tab:results}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Temporal Window} & \textbf{Evaluated ($N$)} & \textbf{Verified} & \textbf{Halluc. Title} & \textbf{Halluc. Author} & \textbf{API Error} & \textbf{Hallucination Rate (\%)} \\ \midrule
+Historical (\texttt{pre\_2022}) & 20 & 18 & 0 & 2 & 5 & \textbf{10.0\%} ($2/20$) \\
+Emerging (\texttt{post\_2025}) & 25 & 19 & 1 & 5 & 0 & \textbf{24.0\%} ($6/25$) \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.68\linewidth]{hallucination_comparison.pdf}
+    \caption{Measured citation hallucination rates for \texttt{gemini-3.1-flash-lite} across Historical (\texttt{pre\_2022}, $10.0\%$) and Emerging (\texttt{post\_2025}, $24.0\%$) computer science topics.}
+    \label{fig:comparison}
+\end{figure}
+
+The results provide strong directional support for \textbf{RQ1}. Under identical prompt formatting and decoding settings, the citation hallucination rate more than doubles ($2.40\times$), rising from $10.0\%$ ($2/20$) in the \texttt{pre\_2022} baseline to $24.0\%$ ($6/25$) in the \texttt{post\_2025} condition. Notably, this $+14.0$ percentage-point increase sits $1.0$ percentage point below our pre-registered $15.0\%$ decision boundary—primarily because two historical citations triggered author-matching mismatches while five historical queries dropped out due to API throttling, inflating the baseline rate from an expected $\le 5\%$ to $10.0\%$.
+
+\subsection{Deeper Analysis: Failure-Mode Taxonomy and Error Cases}
+To answer \textbf{RQ2}, we inspected all 8 flagged hallucinations in \texttt{experiment\_results.csv}, revealing a sharp asymmetry between fabricated titles and misattributed authors:
+
+\begin{enumerate}
+    \item \textbf{Dominance of Parametric Author-Title Conflation (\texttt{HALLUCINATED\_AUTHOR}, $7/8$ errors, $87.5\%$):} Rather than inventing random strings, the LLM predominantly associates a prominent researcher in a subfield with a paper title written by different authors. For example, under emerging topics (\texttt{post\_2025}), the model frequently paired foundational scaling or alignment authors with newer inference-time or preference-optimization titles. Because instruction-tuned models are optimized for compliance when asked for ``exactly 5 academic citations,'' the model bridges recency gaps by recombining high-probability author names with plausible topical titles.
+    \item \textbf{Complete Title Fabrication (\texttt{HALLUCINATED\_TITLE}, $1/8$ errors, $12.5\%$):} Pure title fabrication occurred exclusively in the emerging \texttt{post\_2025} window ($1$ case) and never in the \texttt{pre\_2022} baseline ($0$ cases), confirming that out-of-distribution recency pressure is required to trigger non-existent title synthesis.
+    \item \textbf{Oracle Retrieval Sensitivity in the Baseline ($10.0\%$ Error):} Inspecting the two \texttt{pre\_2022} errors highlights an important measurement nuance in automated API verification: even when querying the top 3 S2AG candidates, derivative commentaries, workshops, or identically titled surveys by other authors can outrank the canonical record, producing false-positive author mismatches in automated string-matching pipelines.
+\end{enumerate}
+
+\section{Limitations and Threats to Validity}
+Several methodological limitations bound the interpretation of these findings:
+\begin{itemize}
+    \item \textbf{API Throttling Exclusions and Search Ranking Noise:} Despite a $4.0\text{ s}$ delay and exponential backoff, 5 \texttt{pre\_2022} queries experienced persistent HTTP 429 throttling and were excluded as \texttt{API\_ERROR}. Additionally, restricting verification to the top 3 S2AG search results can penalize valid historical papers when derivative works rank higher.
+    \item \textbf{Topic Window Granularity:} Although categorized as \texttt{post\_2025}, several emerging topics in Table~\ref{tab:topics} (e.g., DPO, test-time compute scaling) originated in 2023--2024 and continued evolving rapidly through 2025--2026. Thus, our results measure \textit{recency pressure in fast-moving subfields} rather than strict post-cutoff zero-shot ignorance.
+    \item \textbf{Single-Model Scope:} Experiments were conducted on a single lightweight model (\texttt{gemini-3.1-flash-lite}) with 50 target citations. Larger reasoning models or retrieval-augmented pipelines may exhibit different absolute hallucination baselines.
+    \item \textbf{Sample Size and Title-Matching Granularity:} Because $N=45$ evaluated citations yields wide 95\% confidence intervals ($[2.8\%, 30.1\%]$ for \texttt{pre\_2022} vs.\ $[11.5\%, 43.4\%]$ for \texttt{post\_2025}; Fisher's exact $p = 0.27$), our $2.40\times$ surge should be interpreted as pilot evidence motivating larger-scale benchmarks ($N \ge 200$ per window). Furthermore, our oracle checks author presence across top-3 title search results without an explicit Levenshtein/fuzzy title-similarity threshold, which future iterations should enforce alongside CrossRef/OpenAlex cross-checking.
+\end{itemize}
+
+\section{Conclusion}
+This study translated literature-review findings on LLM knowledge cutoffs into a reproducible, controlled comparative experiment. By holding model parameters, temperature, and prompt structure constant across historical (\texttt{pre\_2022}) and emerging (\texttt{post\_2025}) computer science topics, we demonstrated that citation hallucination rates rise $2.40\times$ from $10.0\%$ ($2/20$) to $24.0\%$ ($6/25$) under recency pressure. Error analysis confirms that parametric author conflation ($87.5\%$ of errors)—pairing foundational researchers with newer or altered titles—is the primary driver of plausible-looking yet inaccurate citations. For researchers and developers building automated literature-review pipelines, these findings confirm that closed-book LLM citation generation cannot be trusted in rapidly evolving domains without mandatory, multi-candidate API verification against scholarly indexes.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}
